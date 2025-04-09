@@ -372,7 +372,7 @@ auth.onAuthStateChanged(async (user) => {
             logoutBtn.style.display = 'none';
         }
 
-        // Only redirect to login if we're on a dashboard page
+        // Only redirect to login if on dashboard pages
         if (window.location.pathname.includes('dashboard.html')) {
             window.location.href = '/login.html';
         }
