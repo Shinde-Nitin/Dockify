@@ -10,15 +10,26 @@ const authContainer = document.querySelector('.auth-container');
 const errorMessage = document.getElementById('errorMessage');
 const successMessage = document.getElementById('successMessage');
 const logoutBtn = document.getElementById('logoutBtn');
+const rememberMeCheckbox = document.getElementById('rememberMe');
 
 // Get role-specific form elements
 const roleSelect = document.getElementById('signupRole');
 const principalFields = document.getElementById('principalFields');
 const teacherFields = document.getElementById('teacherFields');
 
+// Set up Firebase persistence
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .catch((error) => {
+        console.error('Error setting persistence:', error);
+    });
+
 // Hide messages on page load
 document.addEventListener('DOMContentLoaded', () => {
     clearMessages();
+    // Only check auth state on login page
+    if (window.location.pathname.includes('login.html')) {
+        checkAuthState();
+    }
 });
 
 // Toggle between login and signup forms
@@ -135,8 +146,16 @@ if (loginForm) {
 
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
+        const rememberMe = rememberMeCheckbox.checked;
 
         try {
+            // Set persistence based on remember me checkbox
+            if (rememberMe) {
+                await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+            } else {
+                await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+            }
+
             const userCredential = await auth.signInWithEmailAndPassword(email, password);
             const user = userCredential.user;
 
@@ -148,17 +167,15 @@ if (loginForm) {
                 throw new Error('User data not found');
             }
 
+            // Store user role in sessionStorage for quick access
+            sessionStorage.setItem('userRole', userData.role);
+            sessionStorage.setItem('userId', user.uid);
+
             showSuccess('Login successful! Redirecting...');
 
             // Redirect based on role
             setTimeout(() => {
-                if (userData.role === 'teacher') {
-                    window.location.href = '/teacher/dashboard.html';
-                } else if (userData.role === 'principal') {
-                    window.location.href = '/principal/dashboard.html';
-                } else {
-                    window.location.href = '/index.html';
-                }
+                redirectBasedOnRole(userData.role);
             }, 1500);
 
         } catch (error) {
@@ -323,17 +340,22 @@ auth.onAuthStateChanged(async (user) => {
             const userData = userSnapshot.val();
 
             if (userData) {
+                // Store user role in sessionStorage
+                sessionStorage.setItem('userRole', userData.role);
+                sessionStorage.setItem('userId', user.uid);
+
                 // Show logout button if on dashboard
                 if (logoutBtn) {
                     logoutBtn.style.display = 'block';
                 }
 
-                // Redirect to appropriate dashboard if on login page
+                // Only redirect if we're on the login page and not already on the correct dashboard
                 if (window.location.pathname.includes('login.html')) {
-                    if (userData.role === 'teacher') {
-                        window.location.href = '/teacher/dashboard.html';
-                    } else if (userData.role === 'principal') {
-                        window.location.href = '/principal/dashboard.html';
+                    const currentPath = window.location.pathname;
+                    const targetPath = userData.role === 'teacher' ? '/teacher/dashboard.html' : '/principal/dashboard.html';
+                    
+                    if (!currentPath.includes(targetPath)) {
+                        redirectBasedOnRole(userData.role);
                     }
                 }
             }
@@ -342,16 +364,57 @@ auth.onAuthStateChanged(async (user) => {
         }
     } else {
         // User is signed out
+        // Clear session storage
+        sessionStorage.removeItem('userRole');
+        sessionStorage.removeItem('userId');
+
         if (logoutBtn) {
             logoutBtn.style.display = 'none';
         }
 
-        // Redirect to login if on dashboard
+        // Only redirect to login if we're on a dashboard page
         if (window.location.pathname.includes('dashboard.html')) {
             window.location.href = '/login.html';
         }
     }
 });
+
+// Function to check auth state on page load
+function checkAuthState() {
+    const userRole = sessionStorage.getItem('userRole');
+    const userId = sessionStorage.getItem('userId');
+    
+    if (userRole && userId) {
+        // Only redirect if we're on the login page
+        if (window.location.pathname.includes('login.html')) {
+            const currentPath = window.location.pathname;
+            const targetPath = userRole === 'teacher' ? '/teacher/dashboard.html' : '/principal/dashboard.html';
+            
+            if (!currentPath.includes(targetPath)) {
+                redirectBasedOnRole(userRole);
+            }
+        }
+    }
+}
+
+// Function to redirect based on role
+function redirectBasedOnRole(role) {
+    const currentPath = window.location.pathname;
+    let targetPath;
+    
+    if (role === 'teacher') {
+        targetPath = '/teacher/dashboard.html';
+    } else if (role === 'principal') {
+        targetPath = '/principal/dashboard.html';
+    } else {
+        targetPath = '/index.html';
+    }
+    
+    // Only redirect if we're not already on the target path
+    if (!currentPath.includes(targetPath)) {
+        window.location.href = targetPath;
+    }
+}
 
 // Utility functions
 function showError(message) {
