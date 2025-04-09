@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dockify - Principal Dashboard</title>
+    <link rel="stylesheet" href="../css/shared-header.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Main Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <a href="/" class="logo-container">
+                <img src="../assets/logo.svg" alt="Dockify Logo" class="logo">
+                <span class="logo-text">Dockify</span>
+            </a>
+            <div class="header-right">
+                <button id="logoutBtn" class="btn btn-secondary">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Dashboard Header -->
+        <header class="dashboard-header">
+            <h1>Welcome, <span id="principalName">Principal</span></h1>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            <!-- Teacher Management Section -->
+            <section class="teachers-section">
+                <h2>Manage Teachers</h2>
+                <div id="teachersList" class="teachers-grid">
+                    <!-- Teachers will be dynamically added here -->
+                </div>
+            </section>
+
+            <!-- Filters Section -->
+            <section class="filters-section">
+                <h2>Filters</h2>
+                <div class="filters-grid">
+                    <div class="form-group">
+                        <label for="teacherFilter">Filter by Teacher</label>
+                        <select id="teacherFilter">
+                            <option value="">All Teachers</option>
+                            <!-- Teachers will be dynamically added here -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="documentTypeFilter">Filter by Document Type</label>
+                        <select id="documentTypeFilter">
+                            <option value="">All Types</option>
+                            <option value="caste_certificate">Caste Certificate</option>
+                            <option value="pan_card">PAN Card</option>
+                            <option value="aadhar_card">Aadhar Card</option>
+                            <option value="degree_certificate">Degree Certificate</option>
+                            <option value="experience_letter">Experience Letter</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="searchInput">Search</label>
+                        <input type="text" id="searchInput" placeholder="Search documents...">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Documents Section -->
+            <section class="documents-section">
+                <h2>All Documents</h2>
+                <div id="documentsList" class="documents-grid">
+                    <!-- Documents will be dynamically added here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Delete Teacher</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this teacher? This action cannot be undone and will remove all their documents.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" id="cancelDelete">Cancel</button>
+                <button class="modal-btn delete" id="confirmDelete">Delete Teacher</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-message">Loading...</div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification">
+        <div class="notification-message"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="../js/config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Dockify</h3>
+                <p>Making document management simple and secure.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                    <li><a href="/terms">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: support@dockify.com</p>
+                <p>Phone: +91 9834525980</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Dockify. All rights reserved.</p>
+            <p id="developer-info">Developed by <a href="https://github.com/Shinde-Nitin" style="
+                text-decoration: underline;
+                color: wheat;
+            ">Nitin Shinde (IF6I)</a></p>        </div>        </div>
+    </footer>
+</body>
+</html> 
